@@ -1,19 +1,31 @@
-name: Cloudflare Workers
+name: Deploy to Cloudflare Workers
+
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
-  repository_dispatch:
-    types:
-      - deploy_to_cf_workers
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: denoland/setup-deno@v2
-    - name: Build
-      run: deno run -A scripts/build_cloudflare_workers.ts
-    - uses: cloudflare/wrangler-action@v3
-      with:
-        apiToken: ${{ secrets.CF_API_TOKEN }}
-        accountId: ${{ secrets.CF_ACCOUNT_ID }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 如果你项目还需要构建（你这个仓库是需要的）
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Build Cloudflare Worker
+        run: deno run -A ./scripts/build_cloudflare_workers.ts
+
+      # 🚀 部署（关键修复点）
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          wranglerVersion: "4"
