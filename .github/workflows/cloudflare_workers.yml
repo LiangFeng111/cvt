@@ -26,6 +26,11 @@ jobs:
       # ✅ 手动安装 wrangler（关键）
       - name: Install Wrangler
         run: npm install -g wrangler@4.79.0
+      - name: Debug Env
+        run: |
+          echo "TOKEN length: ${#CLOUDFLARE_API_TOKEN}"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
       # ✅ 直接 deploy（关键）
       - name: Deploy
