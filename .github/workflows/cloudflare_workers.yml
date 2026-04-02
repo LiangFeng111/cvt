@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Workers
+name: Cloudflare Workers
 
 on:
   push:
@@ -11,21 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 如果你项目还需要构建（你这个仓库是需要的）
+      # 构建（你这个项目需要）
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
 
-      - name: Build Cloudflare Worker
+      - name: Build Worker
         run: deno run -A ./scripts/build_cloudflare_workers.ts
 
-      # 🚀 部署（关键修复点）
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # ✅ 手动安装 wrangler（关键）
+      - name: Install Wrangler
+        run: npm install -g wrangler@4.79.0
+
+      # ✅ 直接 deploy（关键）
+      - name: Deploy
+        run: wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
